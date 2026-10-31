@@ -22,3 +22,9 @@ Thumbs.db
 *.db-journal
 *.db-wal
 *.db-shm
+# Test files (local only)
+test_*.py
+*_test.py
+
+# Root requirements.txt (real one is in backend/)
+/requirements.txt
