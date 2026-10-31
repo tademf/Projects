@@ -10,6 +10,8 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
+# 👇 NEW IMPORT
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import print_startup_banner, APP_VERSION, PHASE
 from app.database.database import init_db
@@ -32,6 +34,17 @@ app = FastAPI(
     description="Your PC. Your Phone. One Connected Experience.",
     version=APP_VERSION,
     lifespan=lifespan,
+)
+
+# 👇 NEW CORS MIDDLEWARE BLOCK
+# This allows your React app on port 5173 to talk to your FastAPI backend on port 8000.
+# Without this, the browser blocks the fetch() request!
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins (fine for local dev)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows POST, GET, etc.
+    allow_headers=["*"],  # Allows Authorization headers
 )
 
 # Register routers
