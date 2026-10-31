@@ -9,6 +9,7 @@
   --color-nexus-text: #e8eaf0;
   --color-nexus-text-muted: #8b8fa3;
   --color-nexus-text-dim: #5a5e75;
+  --color-nexus-success: #10b981;
   --color-nexus-danger: #ef4444;
 }
 
@@ -19,4 +20,12 @@ html, body, #root {
   background-color: var(--color-nexus-bg);
   color: var(--color-nexus-text);
   font-family: system-ui, -apple-system, sans-serif;
+}
+
+.nexus-card {
+  background-color: var(--color-nexus-surface);
+  border-radius: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
 }

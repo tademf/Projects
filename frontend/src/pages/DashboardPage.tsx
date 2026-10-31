@@ -1,42 +1,136 @@
-/**
- * NEXUS Remote — Dashboard placeholder.
- *
- * Phase 3.5 will replace this with live WebSocket-fed CPU/RAM cards.
- */
-
 import { motion } from "framer-motion";
-import { LogOut, Construction } from "lucide-react";
+import {
+  Cpu,
+  MemoryStick,
+  HardDrive,
+  Battery,
+  Wifi,
+  Power,
+  Server,
+} from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
+import { useSystemStats } from "../hooks/useSystemStats";
 
 export function DashboardPage() {
   const { deviceName, logout } = useAuth();
+  const { stats, device, uptimeHuman, isConnected } = useSystemStats();
 
   return (
-    <div className="min-h-screen bg-nexus-bg flex items-center justify-center p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md text-center"
-      >
-        <Construction className="text-nexus-cyan mx-auto mb-4" size={48} />
-        <h1 className="text-2xl font-bold text-nexus-cyan mb-2">Paired!</h1>
-        <p className="text-nexus-text-muted mb-1">
-          Connected as{" "}
-          <span className="text-nexus-text font-semibold">
-            {deviceName ?? "Unknown"}
-          </span>
-        </p>
-        <p className="text-nexus-text-dim text-sm mb-8">
-          Dashboard coming in Phase 3.5
-        </p>
+    <div className="min-h-screen bg-nexus-bg p-4 pb-20">
+      <div className="max-w-md mx-auto space-y-4">
+        {/* Header */}
+        <header className="flex items-center justify-between pt-4 pb-2">
+          <div>
+            <h1 className="text-xl font-bold text-nexus-text flex items-center gap-2">
+              <Server size={20} className="text-nexus-cyan" />
+              {device?.hostname || "Connecting..."}
+            </h1>
+            <p className="text-xs text-nexus-text-muted mt-1">
+              {device?.os} • {deviceName}
+            </p>
+          </div>
+          <div
+            className={`px-3 py-1 rounded-full text-xs font-medium border ${
+              isConnected
+                ? "bg-nexus-success/10 text-nexus-success border-nexus-success/20"
+                : "bg-nexus-danger/10 text-nexus-danger border-nexus-danger/20"
+            }`}
+          >
+            {isConnected ? "● Live" : "○ Disconnected"}
+          </div>
+        </header>
+
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard
+            icon={<Cpu />}
+            label="CPU"
+            value={stats ? `${stats.cpu.percent}%` : "--"}
+            sub={device ? `${device.cpu_cores_logical} cores` : ""}
+            color="cyan"
+          />
+          <StatCard
+            icon={<MemoryStick />}
+            label="RAM"
+            value={stats ? `${stats.ram.percent}%` : "--"}
+            sub={stats ? `${stats.ram.used_gb} / ${stats.ram.total_gb} GB` : ""}
+            color="blue"
+          />
+          <StatCard
+            icon={<HardDrive />}
+            label="Disk"
+            value={stats ? `${stats.disk.percent}%` : "--"}
+            sub={stats ? `${stats.disk.free_gb} GB free` : ""}
+            color="cyan"
+          />
+          <StatCard
+            icon={<Wifi />}
+            label="Uptime"
+            value={uptimeHuman || "--"}
+            sub="Since last boot"
+            color="blue"
+          />
+        </div>
+
+        {/* Battery */}
+        {stats?.battery && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="nexus-card flex items-center justify-between"
+          >
+            <div className="flex items-center gap-2 text-nexus-text-muted">
+              <Battery
+                size={18}
+                className={stats.battery.plugged ? "text-nexus-success" : ""}
+              />
+              <span className="text-sm">
+                Battery {stats.battery.plugged && "(Charging)"}
+              </span>
+            </div>
+            <span className="text-nexus-text font-bold">
+              {stats.battery.percent}%
+            </span>
+          </motion.div>
+        )}
+
+        {/* Disconnect */}
         <button
           onClick={() => logout()}
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-nexus-surface border border-white/10 text-nexus-text hover:border-nexus-danger/40 transition-colors"
+          className="w-full mt-6 flex items-center justify-center gap-2 py-3 rounded-xl bg-nexus-surface border border-white/5 text-nexus-danger hover:bg-nexus-surface-elevated transition-colors"
         >
-          <LogOut size={18} />
+          <Power size={18} />
           Disconnect
         </button>
-      </motion.div>
+      </div>
     </div>
+  );
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+  sub,
+  color,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  sub: string;
+  color: "cyan" | "blue";
+}) {
+  const accent = color === "cyan" ? "text-nexus-cyan" : "text-nexus-blue";
+  return (
+    <motion.div whileHover={{ scale: 1.02 }} className="nexus-card">
+      <div className={`flex items-center gap-2 mb-2 ${accent}`}>
+        {icon}
+        <span className="text-xs text-nexus-text-muted uppercase tracking-wider">
+          {label}
+        </span>
+      </div>
+      <div className="text-2xl font-bold text-nexus-text">{value}</div>
+      <div className="text-xs text-nexus-text-dim mt-1">{sub}</div>
+    </motion.div>
   );
 }
