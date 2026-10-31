@@ -3,6 +3,7 @@ NEXUS Remote — FastAPI backend entry point.
 
 Phase 1: Health endpoints ✅
 Phase 2: Database + PIN + Pairing ✅
+Phase 3: System monitor + WebSocket stream
 """
 
 from contextlib import asynccontextmanager
@@ -13,6 +14,7 @@ from fastapi import FastAPI
 from app.config import print_startup_banner, APP_VERSION, PHASE
 from app.database.database import init_db
 from app.api.routes import auth as auth_routes
+from app.api.routes import system_ws
 
 
 @asynccontextmanager
@@ -34,6 +36,7 @@ app = FastAPI(
 
 # Register routers
 app.include_router(auth_routes.router)
+app.include_router(system_ws.router)
 
 
 @app.get("/")
@@ -46,6 +49,7 @@ async def root():
         "docs": "/docs",
         "health": "/health",
         "auth": "/auth/pair",
+        "ws": "/ws/system",
     }
 
 
