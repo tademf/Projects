@@ -8,7 +8,7 @@ export function TouchpadPage() {
   const [isClicking, setIsClicking] = useState(false);
 
   // Sensitivity multiplier (adjust this if cursor moves too fast/slow)
-  const SENSITIVITY = 2.0;
+  const SENSITIVITY = 1.5;
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
@@ -19,14 +19,11 @@ export function TouchpadPage() {
     if (!lastTouch.current) return;
     const touch = e.touches[0];
 
-    // Calculate delta
     const dx = (touch.clientX - lastTouch.current.x) * SENSITIVITY;
     const dy = (touch.clientY - lastTouch.current.y) * SENSITIVITY;
 
-    // Update last touch
     lastTouch.current = { x: touch.clientX, y: touch.clientY };
 
-    // Send to backend (fire and forget)
     request("/input/mouse/move", {
       method: "POST",
       body: { dx: Math.round(dx), dy: Math.round(dy) },
