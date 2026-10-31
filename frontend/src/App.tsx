@@ -6,6 +6,7 @@ import {
   MousePointer2,
   Keyboard,
   PlayCircle,
+  FolderUp,
 } from "lucide-react";
 import { useAuth } from "./hooks/useAuth";
 import { PairingPage } from "./pages/PairingPage";
@@ -13,8 +14,9 @@ import { DashboardPage } from "./pages/DashboardPage";
 import { TouchpadPage } from "./pages/TouchpadPage";
 import { KeyboardPage } from "./pages/KeyboardPage";
 import { MediaPage } from "./pages/MediaPage";
+import { FilesPage } from "./pages/FilesPage";
 
-type Tab = "dashboard" | "touchpad" | "keyboard" | "media";
+type Tab = "dashboard" | "touchpad" | "keyboard" | "media" | "files";
 
 function App() {
   const { isPaired, isLoading } = useAuth();
@@ -42,9 +44,9 @@ function App() {
         {activeTab === "touchpad" && <TouchpadPage />}
         {activeTab === "keyboard" && <KeyboardPage />}
         {activeTab === "media" && <MediaPage />}
+        {activeTab === "files" && <FilesPage />}
       </div>
 
-      {/* Bottom Navigation (4 items) */}
       <nav className="fixed bottom-0 w-full bg-nexus-surface border-t border-white/5 flex justify-around py-3 z-50">
         <NavButton
           icon={<LayoutDashboard size={20} />}
@@ -69,6 +71,12 @@ function App() {
           label="Media"
           active={activeTab === "media"}
           onClick={() => setActiveTab("media")}
+        />
+        <NavButton
+          icon={<FolderUp size={20} />}
+          label="Files"
+          active={activeTab === "files"}
+          onClick={() => setActiveTab("files")}
         />
       </nav>
     </div>

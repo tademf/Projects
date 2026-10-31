@@ -3,21 +3,25 @@ NEXUS Remote — FastAPI backend entry point.
 
 Phase 1: Health endpoints ✅
 Phase 2: Database + PIN + Pairing ✅
-Phase 3: System monitor + WebSocket stream
+Phase 3: System monitor + WebSocket stream ✅
+Phase 4: Mouse Touchpad ✅
+Phase 5: Keyboard & Media ✅
+Phase 6: File Transfer
 """
 
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 
 from fastapi import FastAPI
-# 👇 NEW IMPORT
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import print_startup_banner, APP_VERSION, PHASE
 from app.database.database import init_db
 from app.api.routes import auth as auth_routes
 from app.api.routes import system_ws
-from app.api.routes import input_control  # 👈 ADD THIS
+from app.api.routes import input_control
+from app.api.routes import files as files_routes  # 👈 ADD THIS
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -36,21 +40,21 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# 👇 NEW CORS MIDDLEWARE BLOCK
-# This allows your React app on port 5173 to talk to your FastAPI backend on port 8000.
-# Without this, the browser blocks the fetch() request!
+# CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allows all origins (fine for local dev)
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # Allows POST, GET, etc.
-    allow_headers=["*"],  # Allows Authorization headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Register routers
 app.include_router(auth_routes.router)
-app.include_router(system_ws.router)      # 👈 ADD THIS BACK
+app.include_router(system_ws.router)
 app.include_router(input_control.router)
+app.include_router(files_routes.router)  # 👈 ADD THIS
+
 
 @app.get("/")
 async def root():

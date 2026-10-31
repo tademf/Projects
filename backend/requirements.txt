@@ -1,3 +1,4 @@
+aiofiles==25.1.0
 annotated-doc==0.0.5
 annotated-types==0.8.0
 anyio==4.15.1
@@ -6,11 +7,20 @@ fastapi==0.162.0
 h11==0.16.0
 httptools==0.9.0
 idna==3.20
+MouseInfo==0.1.3
 opentelemetry-api==1.45.2
+psutil==7.2.2
+PyAutoGUI==0.9.54
 pydantic==2.14.2
 pydantic_core==2.50.2
+PyGetWindow==0.0.9
+PyMsgBox==2.0.1
+pyperclip==1.11.0
+PyRect==0.2.0
+PyScreeze==1.0.1
 python-dotenv==1.2.4
 python-multipart==0.0.33
+pytweening==1.2.0
 PyYAML==6.0.3
 SQLAlchemy==2.1.6
 starlette==1.10.0
