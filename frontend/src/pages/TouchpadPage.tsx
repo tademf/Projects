@@ -1,5 +1,5 @@
-import { useRef, useState } from "react";
-import { request } from "../services/api";
+import { useRef, useState, useEffect } from "react";
+import { tokenStore, BACKEND_URL } from "../services/api";
 import { MousePointer2, Move } from "lucide-react";
 
 export function TouchpadPage() {
@@ -7,8 +7,25 @@ export function TouchpadPage() {
   const lastTouch = useRef<{ x: number; y: number } | null>(null);
   const [isClicking, setIsClicking] = useState(false);
 
-  // Sensitivity multiplier (adjust this if cursor moves too fast/slow)
-  const SENSITIVITY = 1.5;
+  // WebSocket reference
+  const ws = useRef<WebSocket | null>(null);
+
+  // Sensitivity
+  const SENSITIVITY = 1.8;
+
+  useEffect(() => {
+    // Connect to a dedicated mouse WebSocket
+    const token = tokenStore.get();
+    if (!token) return;
+
+    const wsUrl =
+      BACKEND_URL.replace(/^http/, "ws") + `/ws/system?token=${token}`;
+    ws.current = new WebSocket(wsUrl);
+
+    return () => {
+      ws.current?.close();
+    };
+  }, []);
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
@@ -19,43 +36,46 @@ export function TouchpadPage() {
     if (!lastTouch.current) return;
     const touch = e.touches[0];
 
+    // Calculate delta
     const dx = (touch.clientX - lastTouch.current.x) * SENSITIVITY;
     const dy = (touch.clientY - lastTouch.current.y) * SENSITIVITY;
 
     lastTouch.current = { x: touch.clientX, y: touch.clientY };
 
-    request("/input/mouse/move", {
-      method: "POST",
-      body: { dx: Math.round(dx), dy: Math.round(dy) },
-    }).catch(() => {});
+    // Send instantly via WebSocket (no HTTP overhead!)
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      const sendDx = Math.round(dx);
+      const sendDy = Math.round(dy);
+      if (sendDx !== 0 || sendDy !== 0) {
+        ws.current.send(
+          JSON.stringify({
+            type: "mouse_move",
+            dx: sendDx,
+            dy: sendDy,
+          }),
+        );
+      }
+    }
   };
 
   const handleTouchEnd = () => {
     lastTouch.current = null;
   };
 
-  const handleLeftClick = async () => {
-    setIsClicking(true);
-    try {
-      await request("/input/mouse/click", {
-        method: "POST",
-        body: { button: "left" },
-      });
-    } catch (err) {
-      console.error(err);
+  const sendClick = (button: string) => {
+    if (ws.current && ws.current.readyState === WebSocket.OPEN) {
+      ws.current.send(JSON.stringify({ type: "mouse_click", button }));
     }
+  };
+
+  const handleLeftClick = () => {
+    setIsClicking(true);
+    sendClick("left");
     setTimeout(() => setIsClicking(false), 200);
   };
 
-  const handleRightClick = async () => {
-    try {
-      await request("/input/mouse/click", {
-        method: "POST",
-        body: { button: "right" },
-      });
-    } catch (err) {
-      console.error(err);
-    }
+  const handleRightClick = () => {
+    sendClick("right");
   };
 
   return (
@@ -70,7 +90,6 @@ export function TouchpadPage() {
         </p>
       </header>
 
-      {/* Touchpad Area */}
       <div
         ref={touchpadRef}
         onTouchStart={handleTouchStart}
@@ -84,7 +103,6 @@ export function TouchpadPage() {
         </div>
       </div>
 
-      {/* Buttons */}
       <div className="grid grid-cols-2 gap-3 mt-4 mb-4">
         <button
           onClick={handleLeftClick}
