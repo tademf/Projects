@@ -17,7 +17,7 @@ from app.config import print_startup_banner, APP_VERSION, PHASE
 from app.database.database import init_db
 from app.api.routes import auth as auth_routes
 from app.api.routes import system_ws
-
+from app.api.routes import input_control  # 👈 ADD THIS
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -49,8 +49,8 @@ app.add_middleware(
 
 # Register routers
 app.include_router(auth_routes.router)
-app.include_router(system_ws.router)
-
+app.include_router(system_ws.router)      # 👈 ADD THIS BACK
+app.include_router(input_control.router)
 
 @app.get("/")
 async def root():
