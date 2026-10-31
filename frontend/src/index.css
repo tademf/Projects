@@ -1,0 +1,75 @@
+/* NEXUS Remote — global styles + Tailwind v4 import */
+
+@import "tailwindcss";
+
+/* ============================================================
+   NEXUS Design Tokens — dark futuristic theme
+   ============================================================ */
+@theme {
+  /* Backgrounds */
+  --color-nexus-bg: #0a0b0f;              /* deepest background */
+  --color-nexus-surface: #12141c;         /* cards */
+  --color-nexus-surface-elevated: #1a1d28;/* hover states */
+
+  /* Accents */
+  --color-nexus-cyan: #22d3ee;            /* primary accent */
+  --color-nexus-blue: #3b82f6;            /* secondary accent */
+  --color-nexus-glow: rgba(34, 211, 238, 0.15); /* glow effect */
+
+  /* Text */
+  --color-nexus-text: #e8eaf0;            /* primary text */
+  --color-nexus-text-muted: #8b8fa3;      /* secondary text */
+  --color-nexus-text-dim: #5a5e75;        /* tertiary text */
+
+  /* Status */
+  --color-nexus-success: #10b981;
+  --color-nexus-warning: #f59e0b;
+  --color-nexus-danger: #ef4444;
+}
+
+/* ============================================================
+   Base resets + defaults
+   ============================================================ */
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    background-color: var(--color-nexus-bg);
+    color: var(--color-nexus-text);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background-color: var(--color-nexus-bg);
+    color: var(--color-nexus-text);
+    overflow-x: hidden;
+  }
+
+  #root {
+    min-height: 100vh;
+  }
+}
+
+/* ============================================================
+   Utility classes — NEXUS-specific helpers
+   ============================================================ */
+@layer components {
+  .nexus-card {
+    @apply bg-nexus-surface rounded-2xl border border-white/5 p-4;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .nexus-glow {
+    box-shadow: 0 0 24px var(--color-nexus-glow);
+  }
+
+  .nexus-gradient {
+    background: linear-gradient(135deg, var(--color-nexus-surface), var(--color-nexus-surface-elevated));
+  }
+}
